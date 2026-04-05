@@ -9,6 +9,10 @@ def register_user(db: Session, data: RegisterRequest):
     existing_user = db.query(User).filter(User.email == data.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
+    existing_username = db.query(User).filter(User.username == data.username).first()
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
     new_user = User(
         username=data.username, 
         email=data.email, 
