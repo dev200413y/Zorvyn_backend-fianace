@@ -10,3 +10,7 @@ python-dotenv
 pytest
 httpx
 email-validator
+python-telegram-bot
+mistralai
+python-dotenv
+httpx
