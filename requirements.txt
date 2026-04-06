@@ -9,8 +9,4 @@ pydantic-settings
 python-dotenv
 pytest
 httpx
-<<<<<<< HEAD
 email-validator
-=======
-email-validator
->>>>>>> 1905dde (feat: Add live links to API response and docs)
