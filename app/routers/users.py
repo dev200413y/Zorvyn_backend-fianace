@@ -36,3 +36,14 @@ def update_me(data: UserUpdate, db: Session = Depends(get_db), user=Depends(get_
     db.commit()
     db.refresh(db_user)
     return db_user
+@router.get("/analyst/records")
+def analtyst_records(
+    type:str =None,
+    category:str =None,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+    ):
+    if user["role"] not in ["admin","analyst"]:
+        raise HTTPException(status_code=403, detail="analyst or admin access required")
+    from app.services.record_service import get_records
+    return get_records(db, int(user["sub"]), type, category)

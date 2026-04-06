@@ -19,10 +19,32 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 @router.post("/", response_model=RecordResponse)
 def create(data: RecordBase, db: Session = Depends(get_db), user=Depends(get_current_user)):
     return create_record(db, data, int(user["sub"]))
-
-@router.get("/")
-def get_all(type: str = None, category: str = None, db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return get_records(db, int(user["sub"]), type, category)
+def get_all(
+    type: str = None,
+    category: str = None,
+    search:str = None,
+    page: int = 1,
+    limit: int = 10,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user)
+    ):
+    from app.models.record import FinancialRecord
+    query = db.query(FinancialRecord).filter(
+        FinancialRecord.user_id == int(user["sub"])
+    )
+    if type:
+        query = query.filter(FinancialRecord.type == type)
+    if category:
+        query = query.filter(FinancialRecord.category == category)
+    if search:
+        query = query.filter(FinancialRecord.description.ilike(f"%{search}%"))
+    total = query.count()
+    records = query.offset((page - 1) * limit).limit(limit).all()
+    return {
+        "total": total, 
+        'page': page,
+        "limit": limit, 
+        "records": records}
 
 @router.get("/{record_id}")
 def get_one(record_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
